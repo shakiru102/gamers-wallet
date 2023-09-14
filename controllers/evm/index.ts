@@ -153,7 +153,8 @@ const chainId: string = req.query.chainId as string
 
   const response = await Moralis.EvmApi.nft.getWalletNFTs({
     address,
-    ...(chainId && { chain: chainId } )
+    ...(chainId && { chain: chainId } ),
+    normalizeMetadata: true
   });
 
   res.status(200).json(responseHandler(
