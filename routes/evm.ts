@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getWalletChainDetails, getWalletChains, getWalletEvmNft, getWalletNativeBalance, getWalletTestnetChains, initializeSeedPhrase, verifySeedPhrase, walletAddressTokensBalance } from "../controllers/evm";
+import { getWalletByPrivateKey , getWalletChainDetails, getWalletChains, getWalletEvmNft, getWalletNativeBalance, getWalletTestnetChains, initializeSeedPhrase, verifySeedPhrase, walletAddressTokensBalance } from "../controllers/evm";
 
 const route = Router()
 
@@ -11,5 +11,7 @@ route.get('/wallet-token-balances', walletAddressTokensBalance)
 route.get('/wallet-native-balances', getWalletNativeBalance)
 route.get('/wallet-evm-nfts', getWalletEvmNft)
 route.get('/wallet-evm', getWalletChainDetails)
+route.get('/wallet/:privateKey/evm', getWalletByPrivateKey)
+
 
 export default route

@@ -22,7 +22,10 @@ export const verifySeedPhrase = async (req: Request, res: Response) => {
     try {
         const verifySeedPhrase = ethers.Wallet.fromPhrase(seedPhrase)
         if(!verifySeedPhrase) return res.status(400).json(responseHandler(null, null, new Error("Invalid seed phrase")));
-        const address = { address: verifySeedPhrase.address }
+        const address = { 
+          address: verifySeedPhrase.address,
+          privatekey: verifySeedPhrase.privateKey
+        }
         res.status(200).json(responseHandler(
             "Seed phrase verified",
             address
@@ -143,7 +146,6 @@ const chainId: string = req.query.chainId as string
 }
 }
 
-
 export const getWalletEvmNft = async (req: Request, res: Response) => {
   try {
     const address: string = req.query.address as string
@@ -202,4 +204,17 @@ const chainId: string = req.query.chainId as string
 } catch (error: any) {
     res.status(422).json(responseHandler(null, null, Error(error.message)));
 }
+}
+
+export const getWalletByPrivateKey = async (req: Request, res: Response) => {
+  try {
+    const privateKey = req.params.privateKey 
+    const wallet = new ethers.Wallet(privateKey)
+    res.status(200).json(responseHandler(
+      "Wallet address retrieved successfully",
+      { address: wallet.address }
+    ))
+  } catch (error: any) {
+    res.status(400).json(responseHandler(null, null, Error(error.message)))
+  }
 }
