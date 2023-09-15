@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import responseHandler from "../../utils/responseHandler";
 import Moralis from 'moralis'
 import { EvmChain } from "@moralisweb3/common-evm-utils";
+import fs from 'fs'
 
 export const initializeSeedPhrase = async (_: Request, res: Response) => {
    const seed =  ethers.Wallet.createRandom().mnemonic?.phrase
@@ -22,9 +23,15 @@ export const verifySeedPhrase = async (req: Request, res: Response) => {
     try {
         const verifySeedPhrase = ethers.Wallet.fromPhrase(seedPhrase)
         if(!verifySeedPhrase) return res.status(400).json(responseHandler(null, null, new Error("Invalid seed phrase")));
+        const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
+          address: verifySeedPhrase.address,
+        });
         const address = { 
           address: verifySeedPhrase.address,
-          privatekey: verifySeedPhrase.privateKey
+          privatekey: verifySeedPhrase.privateKey,
+          ...( ensResponse && { 
+            ens_name: ensResponse.raw.name
+           })
         }
         res.status(200).json(responseHandler(
             "Seed phrase verified",
@@ -63,7 +70,7 @@ export const getWalletChains = async (req: Request, res: Response) => {
         
           const response = await Moralis.EvmApi.wallets.getWalletActiveChains({
             address,
-            chains,
+            chains
           });
           res.status(200).json(responseHandler(
             "Wallet chain fetched successfully",
@@ -210,11 +217,54 @@ export const getWalletByPrivateKey = async (req: Request, res: Response) => {
   try {
     const privateKey = req.params.privateKey 
     const wallet = new ethers.Wallet(privateKey)
+
+    const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
+      address: wallet.address,
+    });
     res.status(200).json(responseHandler(
       "Wallet address retrieved successfully",
-      { address: wallet.address }
+      { 
+        address: wallet.address,
+        ...( ensResponse && { 
+          ens_name: ensResponse.raw.name
+         })
+      }
     ))
   } catch (error: any) {
     res.status(400).json(responseHandler(null, null, Error(error.message)))
   }
+}
+
+export const getWalletByKeyStoreJsonFile = async (req: Request, res: Response) => {
+   try {
+      const { password } =  req.body
+      if(!req.file)
+      return res.status(422).json(responseHandler(null, null, 
+       Error("key store json file is required")
+        ))
+        if(!password)
+      return res.status(422).json(responseHandler(null, null, 
+       Error("password is required")
+        ))
+        const keyStoreObj = fs.readFileSync(req.file.path, 'utf-8')
+        const wallet = await ethers.Wallet.fromEncryptedJson(keyStoreObj, password)
+        fs.unlinkSync(req.file.path)
+
+        const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
+          address: wallet.address,
+        });
+      
+       res.status(200).json(responseHandler(
+        "Json file decrypted successfully",
+        {
+          address: wallet.address,
+          privateKey: wallet.privateKey,
+          ...( ensResponse && { 
+            ens_name: ensResponse.raw.name
+           } )
+        }
+       ))
+   } catch (error: any) {
+      res.status(400).json(responseHandler(null, null, Error(error.message)))
+   }
 }

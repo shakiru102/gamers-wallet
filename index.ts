@@ -27,4 +27,3 @@ app.use('/api/v1', Evm)
 app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to the Gamers wallet')
 })
-
