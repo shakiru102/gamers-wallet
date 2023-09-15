@@ -165,3 +165,41 @@ const chainId: string = req.query.chainId as string
     res.status(422).json(responseHandler(null, null, Error(error.message)));
 }
 }
+
+export const getWalletChainDetails = async (req: Request, res: Response) => {
+  try {
+    const address: string = req.query.address as string
+if(!address) return res.status(422).json(responseHandler(null, null, Error("address parameter is required")));
+
+const chainId: string = req.query.chainId as string
+
+  const responseTokenBalance = await Moralis.EvmApi.token.getWalletTokenBalances({
+    address,
+    ...(chainId && { chain: chainId } )
+  });
+
+  const responseNativeBalance = await Moralis.EvmApi.balance.getNativeBalance({
+    address,
+    ...(chainId && { chain: chainId } )
+  });
+
+  const responseNFTs = await Moralis.EvmApi.nft.getWalletNFTs({
+    address,
+    ...(chainId && { chain: chainId } ),
+    normalizeMetadata: true
+  });
+
+  const data = {
+    balance: responseNativeBalance.toJSON(),
+    tokens: responseTokenBalance.toJSON(),
+    nfts: responseNFTs.toJSON()
+  }
+
+  res.status(200).json(responseHandler(
+    "Wallet token balances fetched successfully",
+    data
+  ))
+} catch (error: any) {
+    res.status(422).json(responseHandler(null, null, Error(error.message)));
+}
+}
