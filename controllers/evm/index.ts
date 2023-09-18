@@ -26,16 +26,20 @@ export const verifySeedPhrase = async (req: Request, res: Response) => {
         const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
           address: verifySeedPhrase.address,
         });
-        const address = { 
-          address: verifySeedPhrase.address,
-          privatekey: verifySeedPhrase.privateKey,
-          ...( ensResponse && { 
-            ens_name: ensResponse.raw.name
-           })
-        }
+        const Walletaddress = [
+          {
+            evm: { 
+              address: verifySeedPhrase.address,
+              privatekey: verifySeedPhrase.privateKey,
+              ...( ensResponse && { 
+                ens_name: ensResponse.raw.name
+               })
+            }
+          }
+        ] 
         res.status(200).json(responseHandler(
             "Seed phrase verified",
-            address
+            Walletaddress
         ));
     } catch (error: any) {
         res.status(400).json(responseHandler(null, null, Error(error.message)))
@@ -221,6 +225,9 @@ export const getWalletByPrivateKey = async (req: Request, res: Response) => {
     const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
       address: wallet.address,
     });
+
+    
+
     res.status(200).json(responseHandler(
       "Wallet address retrieved successfully",
       { 
