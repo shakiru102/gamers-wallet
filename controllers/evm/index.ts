@@ -28,7 +28,8 @@ export const verifySeedPhrase = async (req: Request, res: Response) => {
         });
         const Walletaddress = [
           {
-            evm: { 
+            name: "evm",
+            walletDetails: { 
               address: verifySeedPhrase.address,
               privatekey: verifySeedPhrase.privateKey,
               ...( ensResponse && { 
@@ -60,25 +61,28 @@ export const getWalletChains = async (req: Request, res: Response) => {
             EvmChain.ETHEREUM,
             EvmChain.FANTOM,
             EvmChain.POLYGON,
-            EvmChain.PALM,
-            // EvmChain.OPTIMISM,
-            // EvmChain.RONIN,
-            // EvmChain.MUMBAI,
-            // EvmChain.SEPOLIA,
-            // EvmChain.ARBITRUM_TESTNET,
-            // EvmChain.AVALANCHE_TESTNET,
-            // EvmChain.BSC_TESTNET,
-            // EvmChain.FANTOM_TESTNET,
-            // EvmChain.GOERLI
+            EvmChain.PALM
           ];
         
           const response = await Moralis.EvmApi.wallets.getWalletActiveChains({
             address,
             chains
           });
+
+          let data: any = [] 
+          for (let chain of response.raw.active_chains) {
+            let balance = await Moralis.EvmApi.balance.getNativeBalance({
+              address,
+               chain: chain.chain_id
+            });
+            data.push({...chain, balance: balance.raw.balance})
+          }
           res.status(200).json(responseHandler(
             "Wallet chain fetched successfully",
-            response.toJSON()
+            {
+              address: response.raw.address,
+              active_chains: data
+            }
           ))
     } catch (error: any) {
      res.status(422).json(responseHandler(null, null, Error(error.message)));
@@ -254,6 +258,7 @@ export const getWalletByKeyStoreJsonFile = async (req: Request, res: Response) =
        Error("password is required")
         ))
         const keyStoreObj = fs.readFileSync(req.file.path, 'utf-8')
+        
         const wallet = await ethers.Wallet.fromEncryptedJson(keyStoreObj, password)
         fs.unlinkSync(req.file.path)
 
