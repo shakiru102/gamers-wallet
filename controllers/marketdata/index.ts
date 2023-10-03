@@ -12,7 +12,8 @@ export const getCoinDetails = async (req: Request, res: Response) => {
               'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
             }
            })
-         res.status(200).json(responseHandler('Coin details fetched successfully', coinData.data.data))
+           const { [symbol.toUpperCase()]: coin } = coinData.data.data
+         res.status(200).json(responseHandler('Coin details fetched successfully', coin))
     } catch (error: any) {
         res.status(400).json(responseHandler(null, null, Error(error.message)))
     }
