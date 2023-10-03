@@ -12,8 +12,14 @@ export const getCoinDetails = async (req: Request, res: Response) => {
               'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
             }
            })
+           const coinPrice = await axios.get(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${symbol}`,{
+            headers: {
+              'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
+            }
+           })
            const { [symbol.toUpperCase()]: coin } = coinData.data.data
-         res.status(200).json(responseHandler('Coin details fetched successfully', coin))
+           const { [symbol.toUpperCase()]: price } = coinPrice.data.data
+         res.status(200).json(responseHandler('Coin details fetched successfully', {...coin, ...price}))
     } catch (error: any) {
         res.status(400).json(responseHandler(null, null, Error(error.message)))
     }

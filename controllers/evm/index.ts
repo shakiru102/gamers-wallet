@@ -461,3 +461,16 @@ export const getWalletByKeyStoreJsonFile = async (req: Request, res: Response) =
       res.status(400).json(responseHandler(null, null, Error(error.message)))
    }
 }
+
+// export const getWalletTransactionsHistory = async (req: Request, res: Response) => {
+
+//   const { address, symbol, chainId, cursor } = req.query
+  
+//   try {
+    
+//   } catch (error: any) {
+    
+//   }
+
+  
+// }
