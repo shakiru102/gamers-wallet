@@ -462,15 +462,54 @@ export const getWalletByKeyStoreJsonFile = async (req: Request, res: Response) =
    }
 }
 
-// export const getWalletTransactionsHistory = async (req: Request, res: Response) => {
+export const getWalletTransactionsHistory = async (req: Request, res: Response) => {
 
-//   const { address, symbol, chainId, cursor } = req.query
-  
-//   try {
+  const { address, symbol, chainId, cursor } = req.query as { address: string, symbol: string, chainId: string, cursor?: string}
+  if(!address) return res.status(400).json(responseHandler(null, null, Error('address query parameter is required')))
+  if(!symbol) return res.status(400).json(responseHandler(null, null, Error('symbol query parameter is required')))
+  if(!chainId) return res.status(400).json(responseHandler(null, null, Error('chainId query parameter is required')))
+  let layerOneSymbol: null | string = null
+   let chainDetails = null
+  chains.forEach(chain => {
     
-//   } catch (error: any) {
+    if(chain.currency?.symbol === symbol.toUpperCase()) {
+      layerOneSymbol = symbol 
+    }
+  })
+  try {
     
-//   }
+    if(layerOneSymbol != null) {
+      const response = await Moralis.EvmApi.transaction.getWalletTransactions({
+        chain: chainId,
+        address,
+        ...(cursor && { cursor: cursor })
+      });
+
+     return res.status(200).json(responseHandler(
+        "Wallet transactions fetched successfully",
+        response.toJSON()
+      ))
+    
+    }
+    
+    const response = await Moralis.EvmApi.token.getWalletTokenTransfers({
+      chain: chainId,
+      address,
+     ...(cursor && { cursor: cursor })
+    });
+
+    return res.status(200).json(responseHandler(
+      "Wallet transactions fetched successfully",
+      {
+        ...response.toJSON(),
+        result: response.raw.result.map((token) => token.token_symbol.toUpperCase() === symbol.toUpperCase() && token)
+      }
+    ))
+
+  } catch (error: any) {
+    
+    return res.status(422).json(responseHandler(null, null, Error(error.message)))
+  }
 
   
-// }
+}
