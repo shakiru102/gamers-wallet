@@ -502,7 +502,7 @@ export const getWalletTransactionsHistory = async (req: Request, res: Response) 
       "Wallet transactions fetched successfully",
       {
         ...response.toJSON(),
-        result: response.raw.result.map((token) => token.token_symbol.toUpperCase() === symbol.toUpperCase() && token)
+        result: response.raw.result.filter((token) => token.token_symbol.toUpperCase() === symbol.toUpperCase())
       }
     ))
 
