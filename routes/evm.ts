@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getWalletByKeyStoreJsonFile, getWalletByPrivateKey , getWalletChainDetails, getWalletChains, getWalletEvmNft, getWalletEvmNftTest, getWalletNativeBalance, getWalletTestnetChains, getWalletTransactionsHistory, initializeSeedPhrase, verifySeedPhrase, walletAddressTestTokensBalance, walletAddressTokensBalance } from "../controllers/evm";
+import { getPriceHistoryBlockNumber, getPriceHistoryTokenPrice, getWalletChainDetails, getWalletChains, getWalletEvmNft, getWalletEvmNftTest, getWalletNativeBalance, getWalletTestnetChains, getWalletTransactionsHistory, initializeSeedPhrase, verifySeedPhrase, walletAddressTestTokensBalance, walletAddressTokensBalance } from "../controllers/evm";
 import { upload } from "../utils/upload";
 
 const route = Router()
@@ -15,6 +15,8 @@ route.post('/wallet-evm-nfts', getWalletEvmNft)
 route.post('/wallet-evm-nfts-test', getWalletEvmNftTest)
 route.get('/wallet-evm', getWalletChainDetails)
 route.get('/wallet-transactions', getWalletTransactionsHistory)
+route.post('/price-history-block-number', getPriceHistoryBlockNumber)
+route.post('/price-history-token-price', getPriceHistoryTokenPrice)
 // route.get('/wallet/:privateKey/evm', getWalletByPrivateKey)
 // route.post('/wallet/key-store-file/evm', upload.single('file'), getWalletByKeyStoreJsonFile)
 

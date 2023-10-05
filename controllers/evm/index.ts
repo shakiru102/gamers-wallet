@@ -398,69 +398,69 @@ const chainId: string = req.query.chainId as string
 }
 }
 
-export const getWalletByPrivateKey = async (req: Request, res: Response) => {
-  try {
-    const privateKey = req.params.privateKey 
-    const wallet = new ethers.Wallet(privateKey)
+// export const getWalletByPrivateKey = async (req: Request, res: Response) => {
+//   try {
+//     const privateKey = req.params.privateKey 
+//     const wallet = new ethers.Wallet(privateKey)
 
-    const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
-      address: wallet.address,
-    });
+//     const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
+//       address: wallet.address,
+//     });
 
     
 
-    res.status(200).json(responseHandler(
-      "Wallet address retrieved successfully",
-      { 
-        address: wallet.address,
-        ...( ensResponse && { 
-          ens_name: ensResponse.raw.name
-         })
-      }
-    ))
-  } catch (error: any) {
-    res.status(400).json(responseHandler(null, null, Error(error.message)))
-  }
-}
+//     res.status(200).json(responseHandler(
+//       "Wallet address retrieved successfully",
+//       { 
+//         address: wallet.address,
+//         ...( ensResponse && { 
+//           ens_name: ensResponse.raw.name
+//          })
+//       }
+//     ))
+//   } catch (error: any) {
+//     res.status(400).json(responseHandler(null, null, Error(error.message)))
+//   }
+// }
 
-export const getWalletByKeyStoreJsonFile = async (req: Request, res: Response) => {
-   try {
-      const { password, keystore } =  req.body
-      if(!keystore )
-      return res.status(422).json(responseHandler(null, null, 
-       Error("keystore is required")
-        ))
-        if(!password)
-      return res.status(422).json(responseHandler(null, null, 
-       Error("password is required")
-        ))
+// export const getWalletByKeyStoreJsonFile = async (req: Request, res: Response) => {
+//    try {
+//       const { password, keystore } =  req.body
+//       if(!keystore )
+//       return res.status(422).json(responseHandler(null, null, 
+//        Error("keystore is required")
+//         ))
+//         if(!password)
+//       return res.status(422).json(responseHandler(null, null, 
+//        Error("password is required")
+//         ))
 
-        const data = JSON.parse(`${keystore}`)
+//         const data = JSON.parse(`${keystore}`)
         
-        fs.writeFileSync('uploads/keystore.json', JSON.stringify(data), 'utf8')
+//         fs.writeFileSync('uploads/keystore.json', JSON.stringify(data), 'utf8')
 
-        const keyStoreObj = fs.readFileSync('uploads/keystore.json', 'utf-8')
-        const wallet = await ethers.Wallet.fromEncryptedJson(keyStoreObj, password)
-        fs.unlinkSync('uploads/keystore.json')
+//         const keyStoreObj = fs.readFileSync('uploads/keystore.json', 'utf-8')
+//         const wallet = await ethers.Wallet.fromEncryptedJson(keyStoreObj, password)
+//         fs.unlinkSync('uploads/keystore.json')
 
-        const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
-          address: wallet.address,
-        });
+//         const ensResponse = await Moralis.EvmApi.resolve.resolveAddress({
+//           address: wallet.address,
+//         });
       
-       res.status(200).json(responseHandler(
-        "Json file decrypted successfully",
-        {
-          address: wallet.address,
-          privateKey: wallet.privateKey,
-          ...( ensResponse && { 
-            ens_name: ensResponse.raw.name
-           } )
-        }
-       ))
-   } catch (error: any) {
-      res.status(400).json(responseHandler(null, null, Error(error.message)))
-   }
-}
+//        res.status(200).json(responseHandler(
+//         "Json file decrypted successfully",
+//         {
+//           address: wallet.address,
+//           privateKey: wallet.privateKey,
+//           ...( ensResponse && { 
+//             ens_name: ensResponse.raw.name
+//            } )
+//         }
+//        ))
+//    } catch (error: any) {
+//       res.status(400).json(responseHandler(null, null, Error(error.message)))
+//    }
+// }
 
 export const getWalletTransactionsHistory = async (req: Request, res: Response) => {
 
@@ -512,4 +512,58 @@ export const getWalletTransactionsHistory = async (req: Request, res: Response) 
   }
 
   
+}
+
+export const getPriceHistoryBlockNumber = async (req: Request, res: Response) => {
+  const dateHistory = req.body.dateHistory as string[]
+  const chainId = req.query.chainId as string
+  if(!dateHistory || !dateHistory.length) return res.status(422).json(responseHandler(null, null, Error(`dateHistory cannot be an empty  array`)));
+  
+  let blockNumbers = []
+  try {
+
+    for(let i=0; i < dateHistory.length; i++) {
+      const response = await Moralis.EvmApi.block.getDateToBlock({
+        chain: chainId || '0x1',
+        date: dateHistory[i]
+      })
+
+      blockNumbers.push(response.raw.block)
+    }
+    res.status(200).json(responseHandler(
+      'Token price history fetched successfully',
+      { blockNumbers }
+    ))
+  } catch (error: any) {
+     res.status(400).json(responseHandler(null, null, Error(error.message)))
+  }
+}
+
+export const getPriceHistoryTokenPrice = async (req: Request, res: Response) => {
+  const blockNumbers = req.body.blockNumbers as number[]
+  const chainId = req.query.chainId as string
+  const address = req.query.token_address as string
+  if(!address) return res.status(422).json(responseHandler(null, null, Error('token_address parameter is required')))
+  if(!blockNumbers || !blockNumbers.length) return res.status(422).json(responseHandler(null, null, Error('blockNumbers is required and cannot be an empty array')))
+  const tokenPrices = []
+
+  try {
+    for(let i = 0; i < blockNumbers.length; i++) {
+      
+      const response =  await Moralis.EvmApi.token.getTokenPrice({
+        chain: chainId || '0x1',
+        toBlock: blockNumbers[i],
+        address,
+        exchange: 'uniswap-v2'
+      })
+
+      tokenPrices.push(response.raw.usdPrice)
+    }
+    res.status(200).json(responseHandler(
+      'Token price history fetched successfully',
+      { tokenPrices }
+    ))
+  } catch (error: any) {
+    res.status(400).json(responseHandler(null, null, Error(error.message)))
+  }
 }
