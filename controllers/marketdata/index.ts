@@ -2,23 +2,16 @@ import axios from "axios";
 import { Request, Response } from "express";
 import responseHandler from "../../utils/responseHandler";
 import Moralis from 'moralis'
+import { ChainId, Token, Fetcher  } from '@uniswap/sdk'
+import { ethers } from "ethers";
+import { coinDetailService, coinPriceService } from "../../services";
 
 export const getCoinDetails = async (req: Request, res: Response) => {
     try {
         const symbol: string = req.query.symbol as string
         if(!symbol) return res.status(422).json(responseHandler(null, null, Error('symbol not found')))
-        const coinData = await axios.get(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/info?symbol=${symbol}`,{
-            headers: {
-              'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
-            }
-           })
-           const coinPrice = await axios.get(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${symbol}`,{
-            headers: {
-              'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
-            }
-           })
-           const { [symbol.toUpperCase()]: coin } = coinData.data.data
-           const { [symbol.toUpperCase()]: price } = coinPrice.data.data
+        const { coin } = await coinDetailService(symbol)
+        const { price } = await coinPriceService(symbol)
          res.status(200).json(responseHandler('Coin details fetched successfully', {...coin, ...price}))
     } catch (error: any) {
         res.status(400).json(responseHandler(null, null, Error(error.message)))
@@ -29,12 +22,8 @@ export const getPrice = async (req: Request, res: Response) => {
     try {
         const symbol: string = req.query.symbol as string
         if(!symbol) return res.status(422).json(responseHandler(null, null, Error('symbol not found')))
-        const coinData = await axios.get(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${symbol}`,{
-            headers: {
-              'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
-            }
-           })
-         res.status(200).json(responseHandler('Coin price fetched successfully', coinData.data.data))
+        const { price } = await coinPriceService(symbol)
+         res.status(200).json(responseHandler('Coin price fetched successfully', price))
     } catch (error: any) {
         res.status(400).json(responseHandler(null, null, Error(error.message)))
     }
@@ -86,3 +75,34 @@ export const dexExchangePrice = async (req: Request, res: Response) => {
     res.status(400).json(responseHandler(null, null, Error(error.message)));
   }
 }
+
+export const networkTokens = async (req: Request, res: Response) => {
+  try {
+    
+    const network: string = req.query.network as string
+  const apiEndpoint = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2';
+  const graphqlQuery = `
+{
+  tokens(where: { id: "${`0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`.toLowerCase()}" }) {
+    id
+    symbol
+    name
+    decimals
+  }
+}
+`;
+
+const response = await axios.post(apiEndpoint, {
+  query: graphqlQuery
+})
+
+res.status(200).json(responseHandler(
+  'Network tokens fetched successfully', 
+  response.data
+  ));
+  } catch (error: any) {
+    res.status(400).json(responseHandler(null, null, Error(error.message)));
+  }
+ 
+}
+

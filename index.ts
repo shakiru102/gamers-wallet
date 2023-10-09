@@ -4,6 +4,7 @@ import cors from 'cors'
 import mongoose from 'mongoose'
 import Moralis from 'moralis'
 import Evm from './routes/evm'
+import Networks from './routes/networks'
 import MarketData from './routes/marketdata'
 
 env.config()
@@ -23,7 +24,7 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use('/api/v1', Evm)
+app.use('/api/v1', [Evm, Networks])
 app.use('/api/v1/market-data', MarketData)
 
 app.get('/', (req: Request, res: Response) => {
