@@ -5,6 +5,8 @@ import Moralis from 'moralis'
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import fs from 'fs'
 import axios from "axios";
+import { getChainNode } from "../../services";
+import { ChainIdProps } from "../../types";
 
 
 const chains = [
@@ -330,7 +332,7 @@ export const getPriceHistoryTokenPrice = async (req: Request, res: Response) => 
 
 export const importNetworkTokens = async (req: Request, res: Response) => {
   try {
-    const {  tokenAddress } = req.query as { chanId: string; tokenAddress: string }
+    const { chainId, tokenAddress } = req.query as { chainId: ChainIdProps; tokenAddress: string }
     const tokenAbi = [
       'function name() view returns (string)',
       'function symbol() view returns (string)',
@@ -338,8 +340,8 @@ export const importNetworkTokens = async (req: Request, res: Response) => {
       'function totalSupply() view returns (uint256)'
     ];
     
-    
-    const provider =  new ethers.JsonRpcProvider('https://bsc.publicnode.com')
+    const rpcUrl = getChainNode(chainId)
+    const provider =  new ethers.JsonRpcProvider(rpcUrl)
     const contract = new ethers.Contract(tokenAddress, tokenAbi, provider)
     const name = await contract.name()
     const symbol = await contract.symbol()
@@ -350,11 +352,13 @@ export const importNetworkTokens = async (req: Request, res: Response) => {
       { 
         name: name.toString() ,
         symbol: symbol.toString(),
-        decimals
+        decimals,
+        chain: chainId,
+        tokenAddress 
       }
     ))
 
   } catch (error: any) {
-    res.status(400).json(responseHandler(null, null, Error(error.message)));
+    res.status(400).json(responseHandler(null, null, Error("Could not resolve token address")));
   }
 }

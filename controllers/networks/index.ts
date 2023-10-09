@@ -47,7 +47,7 @@ export const networkChains = async (req: Request, res: Response) => {
 
     let allChains: object[] = []
     console.log(chains[0]);
-    const { coin } = await coinDetailService('eth')
+    // const { coin } = await coinDetailService('eth')
     for (let chain of chains) {
 
         allChains.push({
@@ -56,7 +56,7 @@ export const networkChains = async (req: Request, res: Response) => {
            rpcUrls: chain.rpcUrls,
            explorer: chain.explorer,
            name: chain.name,
-           logo: chain.currency?.symbol.toLocaleLowerCase() === 'eth' ? coin.logo : null
+          //  logo: chain.currency?.symbol.toLocaleLowerCase() === 'eth' ? coin.logo : null
         })
     }
      res.status(200).json(responseHandler(
