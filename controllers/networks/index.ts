@@ -1,7 +1,10 @@
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { Request, Response } from "express";
 import responseHandler from "../../utils/responseHandler";
-import { coinDetailService } from "../../services";
+import { getChainNode } from "../../services";
+import { ethers } from "ethers";
+import { ChainIdProps } from "../../types";
+import axios from "axios";
 
 const chains = [
     EvmChain.ETHEREUM,
@@ -71,4 +74,67 @@ export const networkTestChains = async (req: Request, res: Response) => {
       'Network Chains fetched successfully',
       testChains
    ))
+}
+
+export const importNetworkTokens = async (req: Request, res: Response) => {
+  try {
+    const { chainId, tokenAddress } = req.query as { chainId: ChainIdProps; tokenAddress: string }
+    const tokenAbi = [
+      'function name() view returns (string)',
+      'function symbol() view returns (string)',
+      'function decimals() view returns (uint8)',
+      'function totalSupply() view returns (uint256)'
+    ];
+    
+    const rpcUrl = getChainNode(chainId)
+    const provider =  new ethers.JsonRpcProvider(rpcUrl)
+    const contract = new ethers.Contract(tokenAddress, tokenAbi, provider)
+    const name = await contract.name()
+    const symbol = await contract.symbol()
+    const decimals = Number(await contract.decimals())
+
+    res.status(200).json(responseHandler(
+      'Token details fetched successfully',
+      { 
+        name: name.toString() ,
+        symbol: symbol.toString(),
+        decimals,
+        chain: chainId,
+        tokenAddress 
+      }
+    ))
+
+  } catch (error: any) {
+    res.status(400).json(responseHandler(null, null, Error("Could not resolve token address")));
+  }
+}
+
+export const networkTokens = async (req: Request, res: Response) => {
+  try {
+    
+    const network: string = req.query.network as string
+  const apiEndpoint = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2';
+  const graphqlQuery = `
+{
+  tokens(where: { id: "${`0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`.toLowerCase()}" }) {
+    id
+    symbol
+    name
+    decimals
+  }
+}
+`;
+
+const response = await axios.post(apiEndpoint, {
+  query: graphqlQuery
+})
+
+res.status(200).json(responseHandler(
+  'Network tokens fetched successfully', 
+  response.data
+  ));
+  } catch (error: any) {
+    res.status(400).json(responseHandler(null, null, Error(error.message)));
+  }
+ 
 }

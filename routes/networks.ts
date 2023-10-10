@@ -1,7 +1,9 @@
 import { Router } from "express";
-import { networkChains, networkTestChains } from "../controllers/networks";
+import { importNetworkTokens, networkChains, networkTestChains, networkTokens } from "../controllers/networks";
 
-const router = Router();
-router.get('/networks', networkChains)
-router.get('/networks-test', networkTestChains)
-export default router
+const route = Router();
+route.get('/networks', networkChains)
+route.get('/networks-test', networkTestChains)
+route.get('/import-network-token', importNetworkTokens)
+route.get('/network-tokens', networkTokens)
+export default route

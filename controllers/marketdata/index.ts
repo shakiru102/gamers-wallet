@@ -2,8 +2,6 @@ import axios from "axios";
 import { Request, Response } from "express";
 import responseHandler from "../../utils/responseHandler";
 import Moralis from 'moralis'
-import { ChainId, Token, Fetcher  } from '@uniswap/sdk'
-import { ethers } from "ethers";
 import { coinDetailService, coinPriceService } from "../../services";
 
 export const getCoinDetails = async (req: Request, res: Response) => {
@@ -76,33 +74,4 @@ export const dexExchangePrice = async (req: Request, res: Response) => {
   }
 }
 
-export const networkTokens = async (req: Request, res: Response) => {
-  try {
-    
-    const network: string = req.query.network as string
-  const apiEndpoint = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2';
-  const graphqlQuery = `
-{
-  tokens(where: { id: "${`0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`.toLowerCase()}" }) {
-    id
-    symbol
-    name
-    decimals
-  }
-}
-`;
-
-const response = await axios.post(apiEndpoint, {
-  query: graphqlQuery
-})
-
-res.status(200).json(responseHandler(
-  'Network tokens fetched successfully', 
-  response.data
-  ));
-  } catch (error: any) {
-    res.status(400).json(responseHandler(null, null, Error(error.message)));
-  }
- 
-}
 
