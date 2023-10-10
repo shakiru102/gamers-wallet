@@ -2,7 +2,7 @@ import axios from "axios";
 import { Request, Response } from "express";
 import responseHandler from "../../utils/responseHandler";
 import Moralis from 'moralis'
-import { coinDetailService, coinPriceService } from "../../services";
+import { coinDetailService, coinListService, coinPriceService } from "../../services";
 
 export const getCoinDetails = async (req: Request, res: Response) => {
     try {
@@ -29,12 +29,8 @@ export const getPrice = async (req: Request, res: Response) => {
 
 export const getTokenList = async (req: Request, res: Response) => {
     try {
-        const coinData = await axios.get(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest`,{
-            headers: {
-              'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
-            }
-           })
-         res.status(200).json(responseHandler('Coin details fetched successfully', coinData.data.data))
+        const { coinList } = await coinListService()
+         res.status(200).json(responseHandler('Coin details fetched successfully', coinList))
     } catch (error: any) {
         res.status(400).json(responseHandler(null, null, Error(error.message)))
     }

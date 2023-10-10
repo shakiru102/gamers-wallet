@@ -1,11 +1,10 @@
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { Request, Response } from "express";
 import responseHandler from "../../utils/responseHandler";
-import { getChainNode } from "../../services";
+import { coinDetailService, coinListService, getChainNode } from "../../services";
 import { ethers } from "ethers";
 import { ChainIdProps } from "../../types";
-import axios from "axios";
-
+import { gamersWalletCoinList } from "../../utils/coinList";
 const chains = [
     EvmChain.ETHEREUM,
     EvmChain.ARBITRUM,
@@ -49,8 +48,6 @@ const chains = [
 export const networkChains = async (req: Request, res: Response) => {
 
     let allChains: object[] = []
-    console.log(chains[0]);
-    // const { coin } = await coinDetailService('eth')
     for (let chain of chains) {
 
         allChains.push({
@@ -111,30 +108,27 @@ export const importNetworkTokens = async (req: Request, res: Response) => {
 
 export const networkTokens = async (req: Request, res: Response) => {
   try {
+    const search: string = req.query.search as string;
     
-    const network: string = req.query.network as string
-  const apiEndpoint = 'https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2';
-  const graphqlQuery = `
-{
-  tokens(where: { id: "${`0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee`.toLowerCase()}" }) {
-    id
-    symbol
-    name
-    decimals
-  }
-}
-`;
+    if(!search || search === '') {
+      const startIndex = Math.floor(Math.random() * (gamersWalletCoinList.length - 50 + 1));
+      const selectedTokens = gamersWalletCoinList.slice(startIndex, 50)
+      return res.status(200).json(responseHandler(
+        'Network tokens fetched successfully', 
+        selectedTokens
+        ))
+    }
 
-const response = await axios.post(apiEndpoint, {
-  query: graphqlQuery
-})
+    const matcedCoinList = gamersWalletCoinList.filter(token => token.name.toUpperCase().includes(search.toUpperCase()) || token.symbol.toUpperCase().includes(search.toUpperCase()))
 
 res.status(200).json(responseHandler(
   'Network tokens fetched successfully', 
-  response.data
+  matcedCoinList
   ));
   } catch (error: any) {
-    res.status(400).json(responseHandler(null, null, Error(error.message)));
+    console.log(error);
+    
+    res.status(200).json(responseHandler(null,null, Error(error.message)));
   }
  
 }

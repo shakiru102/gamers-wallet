@@ -53,3 +53,15 @@ export const getChainNode = (chainId: ChainIdProps) => {
         return 'https://ethereum.publicnode.com';
   }
 }
+export const coinListService = async () => {
+    try {
+        const coinData = await axios.get(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest`,{
+            headers: {
+              'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
+            }
+           })
+         return { coinList: coinData.data.data }  
+    } catch (error: any) {
+        throw error
+    }
+}
