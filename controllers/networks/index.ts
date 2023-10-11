@@ -109,7 +109,7 @@ export const importNetworkTokens = async (req: Request, res: Response) => {
         symbol: symbol.toString(),
         decimals,
         chain: chainId,
-        tokenAddress 
+        contract_address: tokenAddress 
       }
     ))
 
