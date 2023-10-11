@@ -1,6 +1,6 @@
 import { EvmChain } from "@moralisweb3/common-evm-utils"
 import axios from "axios"
-import { ChainIdProps } from "../types"
+import { ChainIdProps, SymbolProps } from "../types"
 
 
 export const coinDetailService = async (symbol: string) => {
@@ -47,8 +47,6 @@ export const getChainNode = (chainId: ChainIdProps) => {
         return 'https://polygon-bor.publicnode.com'    
     case '0x2a15c308d':
         return 'https://palm-mainnet.infura.io/v3/33886901f1b946fda6b6ad15c7b66363'  
-    case '0xa':
-        return 'https://optimism.publicnode.com'   
     default:
         return 'https://ethereum.publicnode.com';
   }
@@ -64,4 +62,25 @@ export const coinListService = async () => {
     } catch (error: any) {
         throw error
     }
+}
+
+export const getChainId = (symbol: SymbolProps) => {
+   switch (symbol) {
+    case 'ETH':
+        return '0x1';
+    case 'ARB': 
+        return '0xa4b1';    
+    case 'AVAX': 
+        return '0xa86a'; 
+    case 'BNB': 
+        return '0x38';
+    case 'CRO': 
+        return '0x19';
+    case 'FTM': 
+        return '0xfa';
+    case 'MATIC': 
+        return '0x89';   
+    default:
+        return '0x2a15c308d';
+   }
 }

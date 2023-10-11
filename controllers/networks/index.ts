@@ -1,9 +1,9 @@
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import { Request, Response } from "express";
 import responseHandler from "../../utils/responseHandler";
-import { coinDetailService, coinListService, getChainNode } from "../../services";
+import { coinDetailService, coinListService, getChainId, getChainNode } from "../../services";
 import { ethers } from "ethers";
-import { ChainIdProps } from "../../types";
+import { ChainIdProps, SymbolProps } from "../../types";
 import { gamersWalletCoinList } from "../../utils/coinList";
 import Moralis from 'moralis'
 
@@ -132,6 +132,7 @@ export const networkTokens = async (req: Request, res: Response) => {
     }
 
     const matcedCoinList = gamersWalletCoinList
+    .map(token => ({ chain: getChainId(token.platform.coin.symbol.toUpperCase() as SymbolProps), ...token }))
     .filter(token => token.name.toUpperCase().includes(search.toUpperCase()) || token.symbol.toUpperCase().includes(search.toUpperCase()))
     .slice(0, 10)
 
