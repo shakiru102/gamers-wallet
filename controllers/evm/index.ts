@@ -3,6 +3,7 @@ import responseHandler from "../../utils/responseHandler";
 import Moralis from 'moralis'
 import { EvmChain } from "@moralisweb3/common-evm-utils";
 import axios from "axios";
+import { coinPriceService } from "../../services";
 
 
 const chains = [
@@ -44,23 +45,28 @@ const chains = [
 export const walletAddressTestTokensBalance = async (req: Request, res: Response) => {
     
   try {
-      const address: string = req.query.address as string
-      const chainId: string = req.query.chainId as string
-      const tokenAddresses: string[] = req.body.tokenAddresses
-  if(!address) return res.status(422).json(responseHandler(null, null, Error("address parameter is required")));
-  
-    const response = await Moralis.EvmApi.token.getWalletTokenBalances({
-      address,
-      chain: chainId,
-      tokenAddresses: tokenAddresses || []
-    });
-     
-    
+    const address: string = req.query.address as string
+    const tokenAddresses: {
+      contract_address: string;
+      chain: string;
+    }[] = req.body.tokenAddresses
+    if(!address) return res.status(422).json(responseHandler(null, null, Error("address parameter is required")));
 
-    res.status(200).json(responseHandler(
-      "Wallet token balances fetched successfully",
-     response.toJSON()
-    ))
+    let walletTokens: any[] = []
+
+    for(let token of tokenAddresses) {
+      const response = await Moralis.EvmApi.token.getWalletTokenBalances({
+        address,
+        chain: token.chain,
+        tokenAddresses: [token.contract_address]
+      });
+       walletTokens.push(response.raw[0])
+    }
+  
+  res.status(200).json(responseHandler(
+    "Wallet token balances fetched successfully",
+    walletTokens
+  ))
   } catch (error: any) {
       res.status(422).json(responseHandler(null, null, Error(error.message)));
   }
@@ -72,29 +78,25 @@ export const walletAddressTokensBalance = async (req: Request, res: Response) =>
     
     try {
         const address: string = req.query.address as string
-        const chainId = req.query.chainId as string
-        const tokenAddresses: string[] = req.body.tokenAddresses
+        const tokenAddresses: {
+          contract_address: string;
+          chain: string;
+        }[] = req.body.tokenAddresses
         if(!address) return res.status(422).json(responseHandler(null, null, Error("address parameter is required")));
-      const response = await Moralis.EvmApi.token.getWalletTokenBalances({
-        address,
-        chain: chainId,
-        tokenAddresses: tokenAddresses || []
-      });
 
-      let walletTokens: any[] = []
+        let walletTokens: any[] = []
 
-      for (let token of response.raw) {
-          const coinPrice = await axios.get(`https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${token.symbol}`,{
-        headers: {
-          'X-CMC_PRO_API_KEY': process.env.COINMARKETCAP_API_KEY
-        }})
-      const { [token.symbol as string]: price } = coinPrice.data.data
-      walletTokens.push({...token,  quote: price })
-      
-      }
-      
-      
+        for(let token of tokenAddresses) {
+          const response = await Moralis.EvmApi.token.getWalletTokenBalances({
+            address,
+            chain: token.chain,
+            tokenAddresses: [token.contract_address]
+          });
 
+           const { price } = await coinPriceService(response.raw[0].symbol)
+           walletTokens.push({...response.raw[0],  quote: price })
+        }
+      
       res.status(200).json(responseHandler(
         "Wallet token balances fetched successfully",
         walletTokens

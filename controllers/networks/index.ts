@@ -5,6 +5,8 @@ import { coinDetailService, coinListService, getChainNode } from "../../services
 import { ethers } from "ethers";
 import { ChainIdProps } from "../../types";
 import { gamersWalletCoinList } from "../../utils/coinList";
+import Moralis from 'moralis'
+
 const chains = [
     EvmChain.ETHEREUM,
     EvmChain.ARBITRUM,
@@ -13,9 +15,7 @@ const chains = [
     EvmChain.CRONOS,
     EvmChain.FANTOM,
     EvmChain.POLYGON,
-    EvmChain.PALM,
-    EvmChain.OPTIMISM,
-    // EvmChain.RONIN
+    EvmChain.PALM
   ];
   
   const testChains = [
@@ -46,23 +46,35 @@ const chains = [
   ]
 
 export const networkChains = async (req: Request, res: Response) => {
-
+  
+   try {
     let allChains: object[] = []
+    const address = req.query.address as string
+    let response = null
     for (let chain of chains) {
-
+      if(address) {
+        response = await Moralis.EvmApi.balance.getNativeBalance({
+          address,
+          chain: chain.hex
+        });
+      }
         allChains.push({
            chain: chain.hex,
            ...chain.currency,
            rpcUrls: chain.rpcUrls,
            explorer: chain.explorer,
            name: chain.name,
-          //  logo: chain.currency?.symbol.toLocaleLowerCase() === 'eth' ? coin.logo : null
+           ...( response && {balance: response.raw.balance})
         })
+        
     }
      res.status(200).json(responseHandler(
         'Network Chains fetched successfully',
         allChains
      ))
+   } catch (error: any) {
+    res.status(400).json(responseHandler(null, null, Error(error)))
+   }
 }
 
 export const networkTestChains = async (req: Request, res: Response) => {
@@ -111,15 +123,17 @@ export const networkTokens = async (req: Request, res: Response) => {
     const search: string = req.query.search as string;
     
     if(!search || search === '') {
-      const startIndex = Math.floor(Math.random() * (gamersWalletCoinList.length - 50 + 1));
-      const selectedTokens = gamersWalletCoinList.slice(startIndex, 50)
+      const startIndex = Math.floor(Math.random() * (gamersWalletCoinList.length - 15 + 1));
+      const selectedTokens = gamersWalletCoinList.slice(startIndex, 15)
       return res.status(200).json(responseHandler(
         'Network tokens fetched successfully', 
         selectedTokens
         ))
     }
 
-    const matcedCoinList = gamersWalletCoinList.filter(token => token.name.toUpperCase().includes(search.toUpperCase()) || token.symbol.toUpperCase().includes(search.toUpperCase()))
+    const matcedCoinList = gamersWalletCoinList
+    .filter(token => token.name.toUpperCase().includes(search.toUpperCase()) || token.symbol.toUpperCase().includes(search.toUpperCase()))
+    .slice(0, 10)
 
 res.status(200).json(responseHandler(
   'Network tokens fetched successfully', 

@@ -63,21 +63,6 @@ export const gamersWalletCoinList = [
         "name": "Tether USDt",
         "symbol": "USDT",
         "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
-        "contract_address": "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
-        "platform": {
-            "name": "Optimism",
-            "coin": {
-                "id": "11840",
-                "name": "Optimism",
-                "symbol": "OP",
-                "slug": "optimism-ethereum"
-            }
-        }
-    },
-    {
-        "name": "Tether USDt",
-        "symbol": "USDT",
-        "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/825.png",
         "contract_address": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
         "platform": {
             "name": "Arbitrum",
@@ -195,21 +180,6 @@ export const gamersWalletCoinList = [
         }
     },
     {
-        "name": "USDC",
-        "symbol": "USDC",
-        "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/3408.png",
-        "contract_address": "0x7f5c764cbc14f9669b88837ca1490cca17c31607",
-        "platform": {
-            "name": "Optimism",
-            "coin": {
-                "id": "11840",
-                "name": "Optimism",
-                "symbol": "OP",
-                "slug": "optimism-ethereum"
-            }
-        }
-    },
-    {
         "name": "Dai",
         "symbol": "DAI",
         "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/4943.png",
@@ -266,21 +236,6 @@ export const gamersWalletCoinList = [
                 "name": "Avalanche",
                 "symbol": "AVAX",
                 "slug": "avalanche"
-            }
-        }
-    },
-    {
-        "name": "Dai",
-        "symbol": "DAI",
-        "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/4943.png",
-        "contract_address": "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
-        "platform": {
-            "name": "Optimism",
-            "coin": {
-                "id": "11840",
-                "name": "Optimism",
-                "symbol": "OP",
-                "slug": "optimism-ethereum"
             }
         }
     },
@@ -356,21 +311,6 @@ export const gamersWalletCoinList = [
                 "name": "Polygon",
                 "symbol": "MATIC",
                 "slug": "polygon"
-            }
-        }
-    },
-    {
-        "name": "Wrapped Bitcoin",
-        "symbol": "WBTC",
-        "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/3717.png",
-        "contract_address": "0x68f180fcce6836688e9084f035309e29bf0a2095",
-        "platform": {
-            "name": "Optimism",
-            "coin": {
-                "id": "11840",
-                "name": "Optimism",
-                "symbol": "OP",
-                "slug": "optimism-ethereum"
             }
         }
     },
@@ -476,21 +416,6 @@ export const gamersWalletCoinList = [
                 "name": "Avalanche",
                 "symbol": "AVAX",
                 "slug": "avalanche"
-            }
-        }
-    },
-    {
-        "name": "Chainlink",
-        "symbol": "LINK",
-        "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/1975.png",
-        "contract_address": "0x350a791bfc2c21f9ed5d10980dad2e2638ffa7f6",
-        "platform": {
-            "name": "Optimism",
-            "coin": {
-                "id": "11840",
-                "name": "Optimism",
-                "symbol": "OP",
-                "slug": "optimism-ethereum"
             }
         }
     },
@@ -836,21 +761,6 @@ export const gamersWalletCoinList = [
                 "name": "Ethereum",
                 "symbol": "ETH",
                 "slug": "ethereum"
-            }
-        }
-    },
-    {
-        "name": "Optimism",
-        "symbol": "OP",
-        "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/11840.png",
-        "contract_address": "0x4200000000000000000000000000000000000042",
-        "platform": {
-            "name": "Optimism",
-            "coin": {
-                "id": "11840",
-                "name": "Optimism",
-                "symbol": "OP",
-                "slug": "optimism-ethereum"
             }
         }
     },
@@ -1826,21 +1736,6 @@ export const gamersWalletCoinList = [
                 "name": "BNB",
                 "symbol": "BNB",
                 "slug": "bnb"
-            }
-        }
-    },
-    {
-        "name": "Synthetix",
-        "symbol": "SNX",
-        "logo": "https://s2.coinmarketcap.com/static/img/coins/64x64/2586.png",
-        "contract_address": "0x8700daec35af8ff88c16bdf0418774cb3d7599b4",
-        "platform": {
-            "name": "Optimism",
-            "coin": {
-                "id": "11840",
-                "name": "Optimism",
-                "symbol": "OP",
-                "slug": "optimism-ethereum"
             }
         }
     },
