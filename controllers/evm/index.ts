@@ -92,9 +92,10 @@ export const walletAddressTokensBalance = async (req: Request, res: Response) =>
             chain: token.chain,
             tokenAddresses: [token.contract_address]
           });
-
-           const { price } = await coinPriceService(response.raw[0].symbol)
+           if(response.raw.length) {
+            const { price } = await coinPriceService(response.raw[0].symbol)
            walletTokens.push({...response.raw[0],  quote: price })
+           }
         }
       
       res.status(200).json(responseHandler(
