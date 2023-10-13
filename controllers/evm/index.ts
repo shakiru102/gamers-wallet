@@ -15,7 +15,7 @@ const chains = [
   EvmChain.FANTOM,
   EvmChain.POLYGON,
   EvmChain.PALM,
-  EvmChain.OPTIMISM,
+  EvmChain.OPTIMISM
 ];
 
 // const testChains = [
