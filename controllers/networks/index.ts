@@ -20,25 +20,25 @@ const chains = [
   
   const testChains = [
     {
-      chain: "eth Gorli",
+      chain: "0x5",
       name: "eth Gorli",
       chain_id: "0x5",
       rpcUrl: ['https://goerli.infura.io/v3/${GOERLI_API_KEY}']
     },
     {
-      chain: "eth Sepolia",
+      chain: "0xaa36a7",
       name: "eth Sepolia",
       chain_id: "0xaa36a7",
       rpcUrl: ['https://sepolia.infura.io/v3/${SEPOLIA_API_KEY}']
     },
     {
-      chain: "polygon Mumbai",
+      chain: "0x13881",
       name: "polygon Mumbai",
       chain_id: "0x13881",
       rpcUrl: []
     },
     {
-      chain: "bsc Testnet",
+      chain: "0x61",
       name: "bsc Testnet",
       chain_id: "0x61",
       rpcUrl: []
