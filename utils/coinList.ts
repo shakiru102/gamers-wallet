@@ -2023,5 +2023,20 @@ export const gamersWalletCoinList = [
                 "slug": "avalanche"
             }
         }
+    },
+    {
+        "name": "Sportrex",
+        "symbol": "SPT",
+        "logo": null,
+        "contract_address": "0x952bfccdb958ba8521ea206cad099554e55ad2a0",
+        "platform": {
+            "name": "BNB Smart Chain (BEP20)",
+            "coin": {
+                "id": "1839",
+                "name": "BNB",
+                "symbol": "BNB",
+                "slug": "bnb"
+            }
+        }
     }
 ]
