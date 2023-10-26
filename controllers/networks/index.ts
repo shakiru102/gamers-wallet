@@ -123,10 +123,10 @@ export const networkTokens = async (req: Request, res: Response) => {
     const search: string = req.query.search as string;
     
     if(!search || search === '') {
-      const startIndex = Math.floor(Math.random() * (gamersWalletCoinList.length - 15 + 1));
+      const startIndex = Math.floor(Math.random() * (gamersWalletCoinList.length));
       const selectedTokens = gamersWalletCoinList
       .map(token => ({ chain: getChainId(token.platform.coin.symbol.toUpperCase() as SymbolProps), ...token }))
-      .slice(startIndex, 15)
+      .slice(startIndex, startIndex + 10)
       return res.status(200).json(responseHandler(
         'Network tokens fetched successfully', 
         selectedTokens
